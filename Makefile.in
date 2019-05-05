@@ -1,0 +1,282 @@
+#############################################################################
+# Autoconf variables
+
+# builddir: where to build the final artifacts
+builddir := .
+# objectdir: container of the objects
+objectdir := objects
+
+# Current position
+srcdir := @srcdir@
+VPATH := @srcdir@
+top_srcdir := @top_srcdir@
+
+# Installation paths
+prefix := @prefix@
+exec_prefix := @exec_prefix@
+libdir := @libdir@
+
+# Subdirectories
+subdirs := @subdirs@ @subdirs_extra@
+
+# Compiler programs & flags
+# !!! It assumes that ${top_srcdir} has been defined in the container file !!!
+AR := ar
+AR_FLAGS := rcsPT
+CC := @CC@
+CXX := @CXX@
+CPPFLAGS := @CPPFLAGS@ 
+EXTRA_CPPFLAGS := @EXTRA_CPPFLAGS@ # extra flags defined by autoconf, similar to AM_CPPFLAGS
+SRC_CPPFLAGS := -I${top_srcdir}/ -I${top_srcdir}/data_structures/
+ALL_CPPFLAGS := ${CPPFLAGS} ${EXTRA_CPPFLAGS} ${SRC_CPPFLAGS}
+CFLAGS := @CFLAGS@
+EXTRA_CFLAGS := @EXTRA_CFLAGS@ # extra flags defined by autoconf, similar to AM_CFLAGS
+ALL_CFLAGS := ${ALL_CPPFLAGS} ${EXTRA_CFLAGS} ${CFLAGS}
+CXXFLAGS := @CXXFLAGS@
+EXTRA_CXXFLAGS := @EXTRA_CXXFLAGS@ # extra flags defined by autoconf, similar to AM_CXXFLAGS
+ALL_CXXFLAGS := ${ALL_CPPFLAGS} ${EXTRA_CXXFLAGS} ${CXXFLAGS}
+
+# Linker
+LIBS := @LIBS@
+LDFLAGS := ${LIBS}
+
+#############################################################################
+# List of the sources to compile (except the main)
+
+sources := \
+	common/configuration.cpp \
+	common/console_arguments.cpp \
+	common/cpu_topology.cpp \
+	common/database.cpp \
+	common/errorhandling.cpp \
+	common/miscellaneous.cpp \
+	common/profiler.cpp \
+	data_structures/driver.cpp \
+	data_structures/factory.cpp \
+	data_structures/interface.cpp \
+	data_structures/parallel.cpp \
+	data_structures/abtree/parallel/abtree.cpp \
+	data_structures/abtree/parallel/garbage_collector.cpp \
+	data_structures/abtree/parallel/thread_context.cpp \
+	data_structures/abtree/sequential/abtree.cpp \
+	data_structures/bwtree/openbwtree.cpp \
+	data_structures/masstree/notsupported.cpp \
+	data_structures/rma/baseline/adaptive_rebalancing.cpp \
+	data_structures/rma/baseline/garbage_collector.cpp \
+	data_structures/rma/baseline/gate.cpp \
+	data_structures/rma/baseline/iterator.cpp \
+	data_structures/rma/baseline/packed_memory_array.cpp \
+	data_structures/rma/baseline/rebalance_plan.cpp \
+	data_structures/rma/baseline/rebalancing_master.cpp \
+	data_structures/rma/baseline/rebalancing_pool.cpp \
+	data_structures/rma/baseline/rebalancing_task.cpp \
+	data_structures/rma/baseline/rebalancing_worker.cpp \
+	data_structures/rma/baseline/storage.cpp \
+	data_structures/rma/baseline/thread_context.cpp \
+	data_structures/rma/baseline/weights.cpp \
+	data_structures/rma/batch_processing/garbage_collector.cpp \
+	data_structures/rma/batch_processing/gate.cpp \
+	data_structures/rma/batch_processing/iterator.cpp \
+	data_structures/rma/batch_processing/packed_memory_array.cpp \
+	data_structures/rma/batch_processing/rebalance_plan.cpp \
+	data_structures/rma/batch_processing/rebalancing_master.cpp \
+	data_structures/rma/batch_processing/rebalancing_pool.cpp \
+	data_structures/rma/batch_processing/rebalancing_statistics.cpp \
+	data_structures/rma/batch_processing/rebalancing_task.cpp \
+	data_structures/rma/batch_processing/rebalancing_worker.cpp \
+	data_structures/rma/batch_processing/storage.cpp \
+	data_structures/rma/batch_processing/thread_context.cpp \
+	data_structures/rma/batch_processing/timer_manager.cpp \
+	data_structures/rma/common/buffered_rewired_memory.cpp \
+	data_structures/rma/common/density_bounds.cpp \
+	data_structures/rma/common/detector.cpp \
+	data_structures/rma/common/knobs.cpp \
+	data_structures/rma/common/memory_pool.cpp \
+	data_structures/rma/common/move_detector_info.cpp \
+	data_structures/rma/common/partition.cpp \
+	data_structures/rma/common/rewired_memory.cpp \
+	data_structures/rma/common/static_index.cpp \
+	data_structures/rma/one_by_one/adaptive_rebalancing.cpp \
+	data_structures/rma/one_by_one/garbage_collector.cpp \
+	data_structures/rma/one_by_one/gate.cpp \
+	data_structures/rma/one_by_one/iterator.cpp \
+	data_structures/rma/one_by_one/packed_memory_array.cpp \
+	data_structures/rma/one_by_one/rebalance_plan.cpp \
+	data_structures/rma/one_by_one/rebalancing_master.cpp \
+	data_structures/rma/one_by_one/rebalancing_pool.cpp \
+	data_structures/rma/one_by_one/rebalancing_task.cpp \
+	data_structures/rma/one_by_one/rebalancing_worker.cpp \
+	data_structures/rma/one_by_one/storage.cpp \
+	data_structures/rma/one_by_one/thread_context.cpp \
+	data_structures/rma/one_by_one/weights.cpp \
+	distributions/apma_distributions.cpp \
+	distributions/cbytearray.cpp \
+	distributions/cbyteview.cpp \
+	distributions/driver.cpp \
+	distributions/factory.cpp \
+	distributions/idls_distributions.cpp \
+	distributions/interface.cpp \
+	distributions/random_permutation.cpp \
+	distributions/sparse_uniform_distribution.cpp \
+	distributions/uniform_distribution.cpp \
+	distributions/zipf_distribution.cpp \
+	experiments/interface.cpp \
+	experiments/parallel_idls.cpp \
+	experiments/parallel_insert.cpp \
+	experiments/parallel_scan.cpp \
+	third-party/art-olc/Epoche.cpp \
+	third-party/art-olc/Tree.cpp \
+	third-party/openbwtree/bwtree.cpp \
+	third-party/sqlite3/sqlite3.c \
+	third-party/zipf/genzipf.cpp
+	
+srcmain := main.cpp
+
+#############################################################################
+# The executable to create
+artifact_main := pmacomp
+
+#############################################################################
+# Helper variables
+makedepend_c = @$(CC) -MM $(ALL_CFLAGS) -MP -MT $@ -MF $(basename $@).d $<
+makedepend_cxx = @$(CXX) -MM $(ALL_CXXFLAGS) -MP -MT $@ -MF $(basename $@).d $<
+# Library objects
+objectdirs := $(patsubst %./, %, $(sort $(addprefix ${objectdir}/, $(dir ${sources} ${srcmain}))))
+objects_c := $(addprefix ${objectdir}/, $(patsubst %.c, %.o, $(filter %.c, ${sources})))
+objects_cxx := $(addprefix ${objectdir}/, $(patsubst %.cpp, %.o, $(filter %.cpp, ${sources})))
+objects := ${objects_c} ${objects_cxx}
+# Main object
+objmain := $(addprefix ${objectdir}/, $(patsubst %.cpp, %.o, ${srcmain}))
+objects_cxx += ${objmain}
+
+# Support for the Masstree data structure
+ifneq (,$(findstring masstree,@subdirs@))
+	masstree_objects := $(addprefix third-party/masstree/, checkpoint.o clp.o compiler.o file.o kvio.o kvrandom.o kvthread.o log.o memdebug.o misc.o straccum.o string.o string_slice.o str.o value_array.o value_string.o value_versioned_array.o)
+	masstree_local_prefix := ${objectdir}/data_structures/masstree
+	masstree_adapter := ${masstree_local_prefix}/globals.o ${masstree_local_prefix}/parallel.o ${masstree_local_prefix}/sequential.o
+	masstree := ${masstree_objects} ${masstree_adapter}
+	objectdirs += ${objectdir}/pma/masstree
+endif 
+
+# Support for tcmalloc
+ifneq (,$(findstring gperftools,${subdirs}))
+	tcmalloc := third-party/gperftools-2.7/lib/libtcmalloc_minimal.so
+endif
+
+liblink = -L${builddir} -l$(patsubst lib%,%, $(basename ${library})) # recursive
+library := libcommon.a
+
+.DEFAULT_GOAL = all
+.PHONY: all
+
+all: Makefile ${builddir}/${artifact_main}
+
+#############################################################################
+# Artifacts to build
+${builddir}/${artifact_main}: ${objmain} ${library} | ${builddir}
+	${CXX} $< $(liblink) ${LDFLAGS} -o $@
+
+#############################################################################
+# Tests (it needs to be refactored!)
+testfolder := tests
+testsources := $(notdir $(wildcard ${srcdir}/${testfolder}/*.cpp))
+testobjdir := ${objectdir}/${testfolder}/
+testbindir := $(abspath ${builddir}/${testfolder})
+objectdirs += ${testobjdir}
+objects_cxx += $(addprefix ${testobjdir}, $(patsubst %.cpp, %.o, ${testsources}))
+testartifacts := $(addprefix tests/, $(basename ${testsources}))
+testignored := "test_reddragon_impl1" # space separated list
+
+.PHONY: check
+check: ${testartifacts}
+	success=1; \
+	for f in `ls ${testbindir}`; do \
+		f="${testbindir}/$$f"; \
+		b=`basename $$f`; \
+		for igntest in "${testignored}"; do \
+			igntest="$$(echo -e "$${igntest}" | tr -d '[:space:]')"; \
+			if [ x"$$igntest" == x"$$b" ]; then \
+				echo "Test blacklisted and ignored: $$f"; \
+				continue 2; \
+			fi; \
+		done; \
+		echo "> Executing $$f ..."; \
+		if [ -x "$$f" ]; then \
+			$$f; \
+			if [ "$$?" -ne 0 ]; then \
+				echo "Test $$b failed. Avoiding to execute further tests."; \
+				success=0; \
+				break; \
+			fi; \
+		fi; \
+	done; \
+	if [ $$success -eq 1 ]; then \
+		echo "!!! All tests passed !!!"; \
+	fi;
+
+${testartifacts}: ${library}
+${testartifacts}: % : ${objectdir}/%.o |${testbindir}
+	${CXX} $< $(liblink) ${LDFLAGS} -o $@
+	
+#############################################################################
+# Compiling the objects
+${library}: ${objects} ${masstree} ${tcmalloc}
+	$(AR) $(AR_FLAGS) $@ $?
+
+# Objects from C files
+${objects_c} : ${objectdir}/%.o : %.c | ${objectdirs}
+	${makedepend_c}
+	${CC} -c ${ALL_CFLAGS} $< -o $@
+
+# Objects from C++ files
+${objects_cxx}: ${objectdir}/%.o : %.cpp | ${objectdirs}
+	${makedepend_cxx}
+	$(CXX) -c $(ALL_CXXFLAGS) $< -o $@
+
+# Create the build directories
+${builddir} ${testbindir} ${objectdirs}:
+	mkdir -pv $@
+	
+# Wrapped projects
+${subdirs}:
+	$(MAKE) -C $@
+.PHONY: ${subdirs}	
+	
+#############################################################################
+# Support for the masstree data structure	
+${masstree_objects}: third-party/masstree
+	
+# leave the above line empty to disable the implicit rule
+
+${masstree_adapter}: ${objectdir}/%.o : %.cpp | ${objectdirs}
+	${makedepend_cxx}
+	$(CXX) -c $(ALL_CXXFLAGS) -include "third-party/masstree/config.h" $< -o $@
+
+#############################################################################
+# Support for tcmalloc	
+${tcmalloc}: third-party/gperftools-2.7
+	$(MAKE) -C $< install
+	
+#############################################################################
+# Remove everything from the current build
+.PHONY: clean
+clean:
+	rm -rf ${builddir}/${artifact_main}
+	rm -rf ${builddir}/${library}
+	rm -rf ${builddir}/${objectdir}
+	rm -rf ${testbindir}
+	
+#############################################################################
+# Regenerate the Makefile when the configuration has been changed
+$(srcdir)/configure: configure.ac aclocal.m4
+	cd '$(srcdir)' && autoconf
+	
+config.status: configure
+	./config.status --recheck
+	
+Makefile: Makefile.in config.status
+	./config.status
+	
+#############################################################################
+# Dependencies to update the translation units if a header has been altered
+-include ${objects:.o=.d}
