@@ -153,7 +153,7 @@ public:
     /**
      * Deallocate an array of locks
      */
-    static void deallocate(Gate* array);
+    static void deallocate(Gate* array, uint64_t num_locks);
 };
 
 

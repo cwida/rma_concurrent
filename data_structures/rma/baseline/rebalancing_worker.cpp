@@ -118,12 +118,18 @@ void RebalancingWorker::main_thread() {
         m_condition_variable.wait(lock, [this](){ return m_task != nullptr; });
         if(m_task == FLAG_STOP) break;
         assert(m_task != nullptr && "Precondition not satisfied: a task should have been set");
-        do_execute();
+        assert(m_worker_id >= 0 && "Precondition not satisfied: the worker_id has not been properly set");
 
-        // ptr to the thread pool
+        // Fetch the pointer to the master & the thread pool
         RebalancingTask* submit_task_done = (m_worker_id == 0) ? m_task : nullptr;
         RebalancingMaster* master = m_task->m_master;
         RebalancingPool& thread_pool = master->thread_pool();
+
+        // Execute the task received
+        do_execute();
+
+        // BUGFIX: when worker_id > 0, after do_execute() completed we cannot look at the content of m_task:
+        // indeed worker #0 could have already returned the task to the master, which in turn it might have freed its memory.
 
         // cleanup its state for the next task
         m_task = nullptr;

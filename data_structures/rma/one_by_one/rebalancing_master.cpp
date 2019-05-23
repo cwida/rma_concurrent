@@ -232,7 +232,7 @@ void RebalancingMaster::main_thread(){
                 }
 
                 // 4) Mark the old data structures for garbage collection
-                m_instance->GC()->mark(locks_old, [](Gate* ptr){ Gate::deallocate(ptr); });
+                m_instance->GC()->mark(locks_old, [num_locks_old](Gate* ptr){ Gate::deallocate(ptr, num_locks_old); });
                 m_instance->GC()->mark(index_old);
             } break;
             default:

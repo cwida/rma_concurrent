@@ -85,7 +85,11 @@ Gate* Gate::allocate(uint64_t num_locks, uint64_t segments_per_lock){
     return array_gates;
 }
 
-void Gate::deallocate(Gate* gates){
+void Gate::deallocate(Gate* gates, uint64_t num_locks){
+    for(uint64_t i = 0; i < num_locks; i++){
+        gates[i].~Gate();
+    }
+
     free(gates);
 }
 

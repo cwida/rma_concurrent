@@ -107,7 +107,7 @@ PackedMemoryArray::~PackedMemoryArray() {
     delete m_index.get_unsafe(); m_index.set(nullptr);
 
     // remove the locks
-    Gate::deallocate(m_locks.get_unsafe()); m_locks.set(nullptr);
+    Gate::deallocate(m_locks.get_unsafe(), get_number_locks()); m_locks.set(nullptr);
 }
 
 

@@ -1,7 +1,6 @@
 /**
  * General information about the parameters of a single execution
  */
-
 CREATE VIEW view_executions AS
 SELECT
 	e.id AS exec_id,

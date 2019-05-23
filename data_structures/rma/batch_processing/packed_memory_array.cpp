@@ -110,13 +110,14 @@ PackedMemoryArray::~PackedMemoryArray() {
     delete m_index.get_unsafe(); m_index.set(nullptr);
 
     // remove all non owned global queues
-    for(size_t i = 0; i < get_number_locks(); i++){
+    const uint64_t num_locks = get_number_locks();
+    for(size_t i = 0; i < num_locks; i++){
         Gate& gate = m_locks.get_unsafe()[i];
         delete gate.m_async_queue; gate.m_async_queue = nullptr;
     }
 
     // remove the locks
-    Gate::deallocate(m_locks.get_unsafe()); m_locks.set(nullptr);
+    Gate::deallocate(m_locks.get_unsafe(), num_locks); m_locks.set(nullptr);
 }
 
 

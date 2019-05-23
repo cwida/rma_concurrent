@@ -305,8 +305,8 @@ done
 ---
 References
 ---
-1. D. De Leo, P. Boncz. Fast concurrent reads and updates with PMAs. In GRADES 2019.
-2. D. De Leo, P. Boncz. Packed Memory Arrays - Rewired. In ICDE 2019. Paper, [Source code](https://github.com/cwida/rma).
+1. D. De Leo, P. Boncz. Fast concurrent reads and updates with PMAs. In GRADES 2019. [Paper](https://ir.cwi.nl/pub/28679). 
+2. D. De Leo, P. Boncz. Packed Memory Arrays - Rewired. In ICDE 2019. [Paper](https://ir.cwi.nl/pub/28649), [Source code](https://github.com/cwida/rma).
 3. F. Schuhknecht, J. Dittrich, A. Sharma. RUMA has it: rewired user-space memory access is possible! In VLDB 2016. [Paper](http://www.vldb.org/pvldb/vol9/p768-schuhknecht.pdf).
 4. Y. Mao, E. Kohler†, R. Morris. Cache craftiness for fast multicore key-value storage. In EuroSys 2012. [Paper](https://pdos.csail.mit.edu/papers/masstree:eurosys12.pdf), [Source code](https://github.com/kohler/masstree-beta).
 5. Z. Wang, A. Pavlo, H. Lim, V. Leis, H. Zhang, M. Kaminsky, and D. Andersen. Building a Bw-Tree takes more than just buzz words. In SIGMOD 2018. [Paper](https://hyeontaek.com/papers/openbwtree-sigmod2018.pdf), [Source code](https://github.com/wangziqi2016/index-microbench).

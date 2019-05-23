@@ -200,35 +200,6 @@ void Storage::extend(size_t num_segments_to_add){
     m_number_segments = num_segments_after;
 }
 
-void Storage::shrink(size_t num_segments_to_remove){
-    COUT_DEBUG("num_segments_to_remove: " << num_segments_to_remove << ", page size: " << get_memory_page_size());
-    if(num_segments_to_remove == 0) return; // nop
-
-    assert(m_memory_keys != nullptr);
-    assert(m_memory_values != nullptr);
-    assert(m_memory_sizes != nullptr);
-    assert(num_segments_to_remove % get_segments_per_extent() == 0 && "The number of segments to remove must be a multiple of segments per page");
-
-    size_t num_segments_before = m_number_segments;
-    assert(num_segments_to_remove < m_number_segments && "Do you want to remove all the segments?");
-    size_t num_segments_after = m_number_segments - num_segments_to_remove;
-
-    const size_t segments_per_extent = get_segments_per_extent();
-    size_t elts_num_extents_before = num_segments_before / segments_per_extent;
-    size_t elts_num_extents_after = num_segments_after / segments_per_extent;
-    size_t elts_num_extents_to_release = elts_num_extents_before - elts_num_extents_after;
-
-    if (elts_num_extents_to_release > 0){
-        m_memory_keys->shrink(elts_num_extents_to_release);
-        m_memory_values->shrink(elts_num_extents_to_release);
-    }
-
-    // we cannot shrink the array sizes
-
-    // update the properties
-    m_number_segments = num_segments_after;
-}
-
 void Storage::dealloc_workspace(int64_t** keys, int64_t** values, decltype(m_segment_sizes)* sizes, common::BufferedRewiredMemory** rewired_memory_keys, common::BufferedRewiredMemory** rewired_memory_values, common::RewiredMemory** rewired_memory_cardinalities){
     if(*rewired_memory_keys != nullptr){
         *keys = nullptr;

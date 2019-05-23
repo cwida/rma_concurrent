@@ -80,11 +80,6 @@ public:
     void extend(size_t num_segments);
 
     /**
-     * Shrink the arrays for the keys/values/cardinalities by `num_segments' segments
-     */
-    void shrink(size_t num_segment);
-
-    /**
      * Retrieve the number of segments per extent
      */
     size_t get_segments_per_extent() const noexcept;

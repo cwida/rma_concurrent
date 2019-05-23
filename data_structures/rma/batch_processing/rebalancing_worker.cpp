@@ -130,12 +130,18 @@ void RebalancingWorker::main_thread() {
         m_condition_variable.wait(lock, [this](){ return m_task != nullptr; });
         if(m_task == FLAG_STOP) break;
         assert(m_task != nullptr && "Precondition not satisfied: a task should have been set");
-        do_execute();
+        assert(m_worker_id >= 0 && "Precondition not satisfied: the worker_id has not been properly set");
 
-        // ptr to the thread pool
+        // Fetch the pointer to the master & the thread pool
         RebalancingTask* submit_task_done = (m_worker_id == 0) ? m_task : nullptr;
         RebalancingMaster* master = m_task->m_master;
         RebalancingPool& thread_pool = master->thread_pool();
+
+        // Execute the task received
+        do_execute();
+
+        // BUGFIX: when worker_id > 0, after do_execute() completed we cannot look at the content of m_task:
+        // indeed worker #0 could have already returned the task to the master, which in turn it might have freed its memory.
 
         // cleanup its state for the next task
         m_task = nullptr;
@@ -753,6 +759,15 @@ void RebalancingWorker::resize(const Storage* input, Storage* output, int64_t in
     assert(input->m_segment_capacity == output->m_segment_capacity && "Incompatible storages");
     assert(output_window_start % 2 == 0 && "Expected an even entry point");
     assert((output_window_length % 2 == 0 || (output_window_start == 0 && output_window_length == 1)) && "Expected an even number of segments");
+    if(cardinality == 0){ // bloody corner case
+        assert(m_task->m_plan.get_cardinality_after() == 0 && "Corner case: expected to be completely empty");
+        assert(loader.cardinality() == 0 && "Corner case: expected empty, otherwise m_task->m_plan.get_cardinality_after() > 0");
+        assert(output->m_number_segments == 1 && "Corner case: expected only one segment available, the PMA is completely empty");
+        assert(m_task->m_subtasks.size() <= 1ull && "Corner case: did we really create more than 1 sub task here?");
+        set_separator_key(0, std::numeric_limits<int64_t>::min());
+        return; // done
+    }
+
     constexpr int64_t INT64_T_MAX = std::numeric_limits<int64_t>::max(); // otherwise it confuses Eclipse :/
     COUT_DEBUG("input_position_start: " << input_position_start);
 
@@ -1007,8 +1022,9 @@ void RebalancingWorker::update_segment_cardinalities() {
 RebalancingWorker::InputIterator::InputIterator(const Storage& storage, int64_t window_start, int64_t window_end) : m_storage(storage){
     int64_t window_last = window_end -1;
 
-    while(window_last >= window_start && storage.m_segment_sizes[window_last] == 0){ window_last--; } // ignore empty segments
+    while(window_last > window_start && storage.m_segment_sizes[window_last] == 0){ window_last--; } // ignore empty segments
     if( storage.m_segment_sizes[window_last] == 0 ){
+        assert(window_start == window_last && "The whole window to rebalance is empty!");
         m_start = m_end = m_position = 0;
     } else {
         if(window_last % 2 == 0){
@@ -1016,19 +1032,20 @@ RebalancingWorker::InputIterator::InputIterator(const Storage& storage, int64_t 
         } else {
             m_end = storage.m_segment_capacity * window_last + storage.m_segment_sizes[window_last];
         }
+
+        while(window_start <= window_last && storage.m_segment_sizes[window_start] == 0){ window_start++; } // ignore empty segments
+
+        assert(storage.m_segment_sizes[window_start] > 0 && "This case should have already been covered with window_end");
+        if(window_start % 2 == 0){
+            m_start = storage.m_segment_capacity * (window_start +1) - storage.m_segment_sizes[window_start];
+        } else {
+            m_start = storage.m_segment_capacity * window_start;
+        }
+
+        COUT_DEBUG("start: " << m_start << ", end: " << m_end);
+        m_position = m_start;
     }
 
-    while(window_start <= window_last && storage.m_segment_sizes[window_start] == 0){ window_start++; } // ignore empty segments
-
-    assert(storage.m_segment_sizes[window_start] > 0 && "This case should have already been covered with window_end");
-    if(window_start % 2 == 0){
-        m_start = storage.m_segment_capacity * (window_start +1) - storage.m_segment_sizes[window_start];
-    } else {
-        m_start = storage.m_segment_capacity * window_start;
-    }
-
-    COUT_DEBUG("start: " << m_start << ", end: " << m_end);
-    m_position = m_start;
     m_feature = MarkerPosition::START;
 }
 
